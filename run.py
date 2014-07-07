@@ -50,8 +50,7 @@ if(con_or_abort != str(1)):
 
 #Start
 
-#dd_r2f_arg = "dd if=/dev/urandom of=/tmp/urandom_file bs=1048560 count=1024"
-dd_r2f_arg = "dd if=/dev/urandom of=/tmp/urandom_file bs=10480 count=1024"
+dd_r2f_arg = "dd if=/dev/urandom of=/tmp/urandom_file bs=1048560 count=1024" #TODO: Make variable
 
 dd_test_arg = "bash " + DIR_SOURCE + "/9416799/dd_test.sh /tmp/urandom_file " + test_dev
 
