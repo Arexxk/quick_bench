@@ -5,6 +5,25 @@ test_os = raw_input("Select OS Platform:\n[0] Linux\n[1] OSX\n> ")
 test_which = raw_input("Would you like to benchmark current device, \
   or other device?\n[0] Current\n[1] Other\n> ")
 
+if(test_os == str(0)):
+  dd_z2f_arg = "dd if=/dev/zero of=" + test_dev + " count=100 bs=256k oflag=direct 2>&1 | \
+    grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
+    awk '{print $1/$3/1024/1024\" MB/s, \" 100/$3\" IOPS\"}'"
+
+  dd_f2n_arg = "dd if=" + test_dev + " of=/dev/null count=100 bs=256k iflag=direct 2>&1 | \
+    grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
+    awk '{print $1/$3/1024/1024\" MB/s, \" 100/$3\" IOPS\"}'"
+elif(test_os == str(1)):
+  dd_z2f_arg = "dd if=/dev/zero of=" + test_dev + " count=100 bs=256k 2>&1 | \
+    grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
+    awk '{print $1/$2/1024/1024\" MB/s, \" 100/$2\" IOPS\"}'"
+
+  dd_f2n_arg = "dd if=" + test_dev + " of=/dev/null count=100 bs=256k 2>&1 | \
+    grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
+    awk '{print $1/$2/1024/1024\" MB/s, \" 100/$2\" IOPS\"}'"
+else:
+  exit(1)
+
 if(test_which == str(0)):
   test_dev = "/tmp/test.dat"
 elif(test_which == str(1)):
@@ -20,13 +39,6 @@ if(con_or_abort != str(1)):
   exit(0)
 
 #Start
-dd_z2f_arg = "dd if=/dev/zero of=" + test_dev + " count=100 bs=256k oflag=direct 2>&1 | \
-  grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
-  awk '{print $1/$3/1024/1024\" MB/s, \" 100/$3\" IOPS\"}'"
-
-dd_f2n_arg = "dd if=" + test_dev + " of=/dev/null count=100 bs=256k iflag=direct 2>&1 | \
-  grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
-  awk '{print $1/$3/1024/1024\" MB/s, \" 100/$3\" IOPS\"}'"
 
 #dd_r2f_arg = "dd if=/dev/urandom of=/tmp/urandom_file bs=1048560 count=1024"
 dd_r2f_arg = "dd if=/dev/urandom of=/tmp/urandom_file bs=1048 count=1024"
