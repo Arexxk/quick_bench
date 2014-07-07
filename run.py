@@ -1,28 +1,6 @@
 #!/usr/bin/env python
 import os
 
-# MACOSX: (SSD)
-# dd if=/dev/zero of=/tmp/test.dat count=100 bs=256k 2>&1 | \
-#       grep bytes | sed 's,[a-zA-Z()/],,g' | \
-#       awk '{print $1/$2/1024/1024" MB/s "100/$2" IOPS"}'
-# 507.11 MB/s 2028.44 IOPS
-#
-# dd of=/dev/null if=/tmp/test.dat count=100 bs=256k 2>&1 | \
-#       grep bytes | sed 's,[a-zA-Z()/],,g' | \
-#       awk '{print $1/$2/1024/1024" MB/s "100/$2" IOPS"}'
-# 4994.01 MB/s 19976 IOPS
-
-# LINUX:
-# dd if=/dev/zero of=/tmp/test.dat count=100 bs=256k oflag=direct 2>&1 | \
-#       grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
-#       awk '{print $1/$3/1024/1024" MB/s, " 100/$3" IOPS"}'
-# 9.06885 MB/s, 36.2754 IOPS
-#
-# dd if=/tmp/test.dat of=/dev/null count=100 bs=256k iflag=direct 2>&1 | \
-#       grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
-#       awk '{print $1/$3/1024/1024" MB/s, " 100/$3" IOPS"}'
-# 48.6412 MB/s, 194.565 IOPS
-
 test_os = raw_input("Select OS Platform:\n[0] Linux\n[1] OSX\n> ")
 test_which = raw_input("Would you like to benchmark current device, \
   or other device?\n[0] Current\n[1] Other\n> ")
@@ -42,10 +20,32 @@ if(con_or_abort != str(1)):
   exit(0)
 
 #Start
-print "Starting input: /dev/zero > output: {}".format(test_dev)
 dd_z2f_arg = "dd if=/dev/zero of=" + test_dev + " count=100 bs=256k oflag=direct 2>&1 | \
   grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
   awk '{print $1/$3/1024/1024\" MB/s, \" 100/$3\" IOPS\"}'"
 
+dd_f2n_arg = "dd if=" + test_dev + " of=/dev/null count=100 bs=256k iflag=direct 2>&1 | \
+  grep bytes | sed 's,[a-zA-Z()/\,],,g' | \
+  awk '{print $1/$3/1024/1024\" MB/s, \" 100/$3\" IOPS\"}'"
+
+#dd_r2f_arg = "dd if=/dev/urandom of=/tmp/urandom_file bs=1048560 count=1024"
+dd_r2f_arg = "dd if=/dev/urandom of=/tmp/urandom_file bs=1048 count=1024"
+
+dd_test_arg = "bash ./9416799/dd_test.sh /tmp/urandom_file " + test_dev
+
+print "Starting input: /dev/zero > output: {}".format(test_dev)
 dd_z2f_stdout = os.popen(dd_z2f_arg).read()
 print dd_z2f_stdout
+
+print "Starting input: {} > output: /dev/null".format(test_dev)
+dd_f2n_stdout = os.popen(dd_f2n_arg).read()
+print dd_f2n_stdout
+
+print "Starting input: /dev/urandom > output: /tmp/urandom_file"
+dd_r2f_stdout = os.popen(dd_r2f_arg).read()
+print dd_r2f_stdout
+
+print "Starting dd_test.sh: infile: /tmp/urandom_file outfile: {}".format(test_dev)
+dd_test_stdout = os.popen(dd_test_arg).read()
+print dd_test_stdout
+
