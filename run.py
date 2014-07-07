@@ -4,6 +4,7 @@ import os
 test_os = raw_input("Select OS Platform:\n[0] Linux\n[1] OSX\n> ")
 test_which = raw_input("Would you like to benchmark current device, \
   or other device?\n[0] Current\n[1] Other\n> ")
+test_label = raw_input("Please give this test a name\n> ")
 
 if(test_os == str(0)):
   dd_z2f_arg = "dd if=/dev/zero of=" + test_dev + " count=100 bs=256k oflag=direct 2>&1 | \
@@ -23,6 +24,9 @@ elif(test_os == str(1)):
     awk '{print $1/$2/1024/1024\" MB/s, \" 100/$2\" IOPS\"}'"
 else:
   exit(1)
+
+fio_test_arg = "cat ./9417014/sdc_raw_libaio_direct.fio | sed 's/\/dev\/sdc/" + \
+  test_dev + "/' | sed s/sdc/" + test_label + "/ > fio"
 
 if(test_which == str(0)):
   test_dev = "/tmp/test.dat"
@@ -61,3 +65,6 @@ print "Starting dd_test.sh: infile: /tmp/urandom_file outfile: {}".format(test_d
 dd_test_stdout = os.popen(dd_test_arg).read()
 print dd_test_stdout
 
+print "Starting fio test: infile/outfile: {}".format(test_dev)
+fio_test_stdout = os.popen(fio_test_arg).read()
+print fio_test_stdout
